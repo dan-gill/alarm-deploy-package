@@ -2,7 +2,7 @@
 -- script : update-probe-from-alarm.lua
 -- author : Dan Gill
 -- January 2020
--- version: 1.00
+-- version: 1.01
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- desc   : The intention of this script is to automate the process of updating
@@ -91,8 +91,8 @@ end
 local function main()
    local a = alarm.get()
 
-   deploy_package("/" .. a.domain .. "/" .. a.hub .. "/" .. a.robot, ade, \
-    package_name, package_version, a.nimid)
+   deploy_package("/" .. a.domain .. "/" .. a.hub .. "/" .. a.robot, ade,
+      package_name, package_version, a.nimid)
    close_alarm(a.nimid, script_short_name)
 end
 
