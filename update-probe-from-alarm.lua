@@ -14,6 +14,7 @@
 -- Version  | Details
 --------------------------------------------------------------------------------
 -- 1.00     | Initial Version
+-- 1.01     | Redesigned to use parameter as package name
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -40,6 +41,7 @@ require ("error_functions")
 require ("table_functions")
 
 local ade = ""
+local package_name = ""
 local package_version = ""
 
 if SCRIPT_ARGUMENT ~= nil then
@@ -48,12 +50,15 @@ if SCRIPT_ARGUMENT ~= nil then
       if k == 1 then
          ade = v
       elseif k == 2 then
+         package_name = v
+      elseif k == 3 then
          package_version = v
       end
    end
 end
 
 local str_beg, str_end = string.find (SCRIPT_NAME,".",1,true)
+local script_short_name = left (SCRIPT_NAME, str_beg-1)
 
 local function deploy_package(robot_addr, ade, pkg_name, pkg_ver, nimid)
    local job = pds.create ()
@@ -74,9 +79,10 @@ local function deploy_package(robot_addr, ade, pkg_name, pkg_ver, nimid)
    pds.delete(job)
 end
 
-local function close_alarm(nimid)
+local function close_alarm(nimid, acked_by)
    local args = pds.create ()
    pds.putString (args, "nimid", nimid)
+   pds.putString (args, "by", acked_by)
 
    nimbus.request("nas", "close_alarms", args)
    pds.delete(args)
@@ -86,8 +92,8 @@ local function main()
    local a = alarm.get()
 
    deploy_package("/" .. a.domain .. "/" .. a.hub .. "/" .. a.robot, ade, \
-    a.supp_key, package_version, a.nimid)
-   close_alarm(a.nimid)
+    package_name, package_version, a.nimid)
+   close_alarm(a.nimid, script_short_name)
 end
 
 main()
